@@ -1,0 +1,11 @@
+.idea\ 
+db.sqlite3 
+geckodriver.exe 
+geckodriver.log 
+Lib\ 
+Lib/ 
+Scripts 
+.idea 
+__pycache__
+*.pyc
+pyvenv.cfg
