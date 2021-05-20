@@ -1,9 +1,7 @@
-.idea\ 
-db.sqlite3 
+db.sqlite3
 geckodriver.exe 
 geckodriver.log 
-Lib\ 
-Lib/ 
+Lib
 Scripts 
 .idea 
 __pycache__
