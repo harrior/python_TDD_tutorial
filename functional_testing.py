@@ -16,6 +16,11 @@ class NewVisitorTest(unittest.TestCase):
         """uninstall"""
         self.browser.quit()
 
+    def check_for_row_in_list_table(self, row_text):
+        table = self.browser.find_element_by_id('id_list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertIn(row_text, [row.text for row in rows])
+
     def test_can_start_a_list_and_retrive_it_later(self):
         """тест, что можно начать список и получить его позже"""
         # Пользователь заходит на главную струницу сайта со списками задач
@@ -35,19 +40,15 @@ class NewVisitorTest(unittest.TestCase):
         # При нажатии Enter страница обновляется и теперь страница содержит "Купить перья павлина"
         inputbox.send_keys(Keys.ENTER)
         time.sleep(1)
-        table = self.browser.find_element_by_id('id_list_table')
-        rows = table.find_elements_by_tag_name('tr')
-        self.assertIn('1: Купить перья павлина', [row.text for row in rows])
+        self.check_for_row_in_list_table('1: Купить перья павлина')
         # Теперь он вводит "Сделать мушку из павлиньих перьев"
         inputbox = self.browser.find_element_by_id('id_new_item')
         inputbox.send_keys('Сделать мушку из павлиньих перьев')
         inputbox.send_keys(Keys.ENTER)
         # Страница снова обновляется и теперь показывает два элемента его списка
         time.sleep(1)
-        table = self.browser.find_element_by_id('id_list_table')
-        rows = table.find_elements_by_tag_name('tr')
-        self.assertIn('1: Купить перья павлина', [row.text for row in rows])
-        self.assertIn('2: Сделать мушку из павлиньих перьев', [row.text for row in rows])
+        self.check_for_row_in_list_table('1: Купить перья павлина')
+        self.check_for_row_in_list_table('2: Сделать мушку из павлиньих перьев')
 
         # Сайт сгенерировал уникальный URL для этого списка?
 
