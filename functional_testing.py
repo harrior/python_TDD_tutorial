@@ -55,5 +55,7 @@ class NewVisitorTest(unittest.TestCase):
         # Пользователь переходит по ссылке - список все еще на месте
         self.fail('Закончить тест!')
 
+
+
 if __name__ == '__main__':
     unittest.main()
