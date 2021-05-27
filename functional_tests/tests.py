@@ -1,11 +1,10 @@
-import time
-import unittest
-
+from django.test import LiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+import time
 
 
-class NewVisitorTest(unittest.TestCase):
+class NewVisitorTest(LiveServerTestCase):
     """ new visitor test """
 
     def setUp(self) -> None:
@@ -24,7 +23,7 @@ class NewVisitorTest(unittest.TestCase):
     def test_can_start_a_list_and_retrive_it_later(self):
         """тест, что можно начать список и получить его позже"""
         # Пользователь заходит на главную струницу сайта со списками задач
-        self.browser.get('http://127.0.0.1:8000')
+        self.browser.get(self.live_server_url)
 
         # Он видит заголовок страницы To-Do list
         self.assertIn('To-Do', self.browser.title)
@@ -55,7 +54,3 @@ class NewVisitorTest(unittest.TestCase):
         # Пользователь переходит по ссылке - список все еще на месте
         self.fail('Закончить тест!')
 
-
-
-if __name__ == '__main__':
-    unittest.main()
