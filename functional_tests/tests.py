@@ -61,7 +61,7 @@ class NewVisitorTest(LiveServerTestCase):
         # Сайт сгенерировал уникальный URL для этого списка?
 
         # Пользователь переходит по ссылке - список все еще на месте
-        self.fail('Закончить тест!')
+        #self.fail('Закончить тест!')
 
     def test_multiple_users_can_start_lists_at_different_url(self):
         ''' тест многочисленные юзеры могут начать свои списки по разным url'''
@@ -91,6 +91,22 @@ class NewVisitorTest(LiveServerTestCase):
         self.assertRegex(fransis_list_url, '/lists/.+')
         self.assertNotEqual(fransis_list_url, edith_list_url)
 
-        page_text = self.browser.find_element_by_tag_name('body')
+        page_text = self.browser.find_element_by_tag_name('body').text
         self.assertNotIn('Купить перья павлина', page_text)
         self.assertIn('Купить молоко', page_text)
+
+    def test_layout_and_styling(self):
+        """ тест макета и оформления """
+        # Эдит открывает домашнюю страницу
+        self.browser.get(self.live_server_url)
+        self.browser.set_window_size(1024, 768)
+
+        # Она видит, что поле ввода аккуратно центрировано
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        self.assertAlmostEqual(inputbox.location['x'] + inputbox.size['width']/2, 512, delta=10)
+
+        inputbox.send_keys('testing')
+        inputbox.send_keys(Keys.ENTER)
+        self.wait_for_row_in_list_table('1: testing')
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        self.assertAlmostEqual(inputbox.location['x'] + inputbox.size['width']/2, 512, delta=10)
