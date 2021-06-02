@@ -1,5 +1,5 @@
 from fabric.contrib.files import append, exists, sed
-from fabric.api import env, local, run
+from fabric.api import env, local, run, sudo
 import random
 
 # Run as fab -i ..\..\authorized_keys  deploy:host=ubuntu@superlists-staging.harrior.ru
@@ -27,7 +27,7 @@ def _update_settings(source_folder, site_name):
     """обновить настройки"""
     settings_path = source_folder + '/superlistst/settings.py'
     sed(settings_path, "DEBUG = True", "DEBUG = False")
-    sed(settings_path, 'ALLOW_HOSTS =.+$', 'ALLOW_HOSTS =.+$', f'ALLOW_HOSTS = ["{site_name}"]')
+    sed(settings_path, 'ALLOWED_HOSTS =.+$', f'ALLOWED_HOSTS = ["{site_name}"]')
     secret_key_file = source_folder + '/superlistst/secret_key.py'
     if not exists(secret_key_file):
         chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
@@ -53,6 +53,28 @@ def _update_database(source_folder):
     """обновить базу данных"""
     run(f'cd {source_folder} && ../virtualenv/bin/python manage.py migrate --noinput')
 
+def _configure_nginx(source_folder):
+    """заполнить и загрузить конфигурации Nginx и добавить сайт в автозагрузку"""
+    nginx_template_file = f'{source_folder}/deploy_tools/nginx.template.conf'
+    nginx_path = f'/etc/nginx'
+
+    sed(nginx_template_file, 'SITENAME', env.host)
+    sudo(f'cp -f {nginx_template_file} {nginx_path}/sites-available/{env.host}')
+    sudo(f'ln -f -s {nginx_path}/sites-available/{env.host} {nginx_path}/sites-enabled/{env.host}')
+    sudo(f'nginx -t')
+    sudo('systemctl daemon-reload')
+    sudo('systemctl reload nginx')
+
+def _configure_gunicorn_as_service(source_folder):
+    gunicorn_service_file = f'{source_folder}/deploy_tools/gunicorn-systemd.template.service'
+    sed(gunicorn_service_file, 'SITENAME', env.host)
+    sudo(f'cp -f {gunicorn_service_file} /etc/systemd/system/gunicorn-{env.host}.service')
+    sudo('systemctl daemon-reload')
+    sudo(f'rm /tmp/{env.host}.socket')
+    sudo(f'systemctl enable gunicorn-{env.host}')
+    sudo(f'systemctl stop gunicorn-{env.host}')
+    sudo(f'systemctl start gunicorn-{env.host}')
+
 
 def deploy():
     """развернуть"""
@@ -64,3 +86,5 @@ def deploy():
     _update_vitrualenv(source_folder)
     _update_static_files(source_folder)
     _update_database(source_folder)
+    _configure_nginx(source_folder)
+    _configure_gunicorn_as_service(source_folder)
