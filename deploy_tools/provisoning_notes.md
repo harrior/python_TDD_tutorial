@@ -1,4 +1,4 @@
-Обечпечение работы нового сайта
+Обеcпечение работы нового сайта
 ================================
 ## Необходимые пакеты:
 * nginx
@@ -7,7 +7,9 @@
 * Git
 
 В Ubuntu:
+
  sudo add-apt-repository ppa:deadsnakes/ppa
+
  sudo apt install nginx git python3.7 python3.7-venv
 
 ## Конфигурация виртального узла
@@ -19,10 +21,11 @@
 * заменить SITENAME на url
 
 ## Структура папок
-/home/username
-|- sites
-  |- SITENAME
-    |- database
-    |- source
-    |- static
-    |- virtualenv
+- /home/username
+  - sites
+    - SITENAME
+        - database
+        - source
+        - static
+        - virtualenv
+    
